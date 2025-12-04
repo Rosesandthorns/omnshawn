@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shawn Join OMN</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Use the Inter font -->
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@700;900&display=swap');
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden; /* Hide scrollbars due to random positioning */
+            background-color: #0d1117; /* Dark background for contrast */
+        }
+        /* Custom CSS for the fading effect */
+        .meme-text {
+            position: absolute;
+            white-space: nowrap;
+            font-weight: 900;
+            font-size: 2rem;
+            opacity: 1;
+            transition: opacity 4s ease-out, transform 4s ease-out; /* Fade out slowly */
+            text-shadow: 0 0 5px rgba(0,0,0,0.5);
+            pointer-events: none; /* Allows clicks to pass through */
+            line-height: 1;
+        }
+
+        /* Responsive font size */
+        @media (min-width: 640px) {
+            .meme-text {
+                font-size: 3rem;
+            }
+        }
+        @media (min-width: 1024px) {
+            .meme-text {
+                font-size: 4rem;
+            }
+        }
+    </style>
+</head>
+<body class="h-screen w-screen relative">
+
+    <div id="meme-container" class="w-full h-full relative">
+        <!-- The dynamic text elements will be injected here -->
+    </div>
+
+    <script>
+        const container = document.getElementById('meme-container');
+        const textToDisplay = "Shawn Join OMN";
+
+        // Function to generate a random bright hex color
+        function getRandomColor() {
+            // Generate three random values (0-255)
+            let r = Math.floor(Math.random() * 256);
+            let g = Math.floor(Math.random() * 256);
+            let b = Math.floor(Math.random() * 256);
+
+            // Ensure at least one color component is high for brightness
+            const maxComponent = Math.max(r, g, b);
+            if (maxComponent < 150) { // If it's generally dark, boost the highest component
+                if (r === maxComponent) r = 255;
+                else if (g === maxComponent) g = 255;
+                else b = 255;
+            }
+
+            // Convert to hex string
+            const toHex = (c) => c.toString(16).padStart(2, '0');
+            return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+        }
+
+        // Function to create and display a new meme text element
+        function spawnMemeText() {
+            const color = getRandomColor();
+            
+            // Create the element
+            const element = document.createElement('div');
+            element.textContent = textToDisplay;
+            element.className = 'meme-text';
+            element.style.color = color;
+            
+            // Calculate random position (in percentages for responsiveness)
+            // Ensure the text stays visible by keeping it away from edges
+            const maxTop = 90;
+            const minTop = 5;
+            const maxLeft = 80;
+            const minLeft = 5;
+
+            const topPercent = Math.random() * (maxTop - minTop) + minTop;
+            const leftPercent = Math.random() * (maxLeft - minLeft) + minLeft;
+            
+            element.style.top = `${topPercent}%`;
+            element.style.left = `${leftPercent}%`;
+
+            // Add the element to the container
+            container.appendChild(element);
+
+            // 1. Start the fade-out process (by changing CSS properties)
+            setTimeout(() => {
+                element.style.opacity = '0';
+                // Add a slight movement effect for the "pop up" feel
+                const moveAmount = Math.random() * 50 - 25; // -25px to +25px
+                element.style.transform = `translate(${moveAmount}px, ${moveAmount}px) scale(0.9)`; 
+            }, 100); // Wait a fraction of a second to ensure transition applies
+
+            // 2. Remove the element from the DOM after the transition is complete
+            // (4000ms is the duration set in the CSS transition property)
+            setTimeout(() => {
+                element.remove();
+            }, 4000); 
+
+            // Cleanup: Ensure we don't have too many elements if the spawn rate is high
+            if (container.children.length > 50) {
+                container.firstChild.remove();
+            }
+        }
+
+        // Start the generation loop: A new piece of text every 500 milliseconds
+        setInterval(spawnMemeText, 500);
+    </script>
+
+</body>
+</html>
